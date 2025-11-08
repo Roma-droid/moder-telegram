@@ -1,0 +1,43 @@
+2025-11-08 14:33:46,710 INFO moder_telegram.app: Starting polling
+2025-11-08 14:33:46,711 INFO aiogram.dispatcher: Start polling
+2025-11-08 14:33:46,730 INFO aiogram.dispatcher: Run polling for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-08 14:33:54,100 INFO aiogram.event: Update id=868518947 is handled. Duration 63 ms by bot id=8347106464
+2025-11-08 14:48:58,054 WARNING aiogram.dispatcher: Received SIGINT signal
+2025-11-08 14:48:58,055 INFO aiogram.dispatcher: Polling stopped for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-08 14:48:58,055 INFO aiogram.dispatcher: Polling stopped
+2025-11-08 14:49:02,039 INFO moder_telegram.app: Starting polling
+2025-11-08 14:49:02,040 INFO aiogram.dispatcher: Start polling
+2025-11-08 14:49:02,073 INFO aiogram.dispatcher: Run polling for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-08 14:49:26,044 INFO aiogram.event: Update id=868518948 is handled. Duration 54 ms by bot id=8347106464
+2025-11-08 15:21:08,988 WARNING aiogram.dispatcher: Received SIGINT signal
+2025-11-08 15:21:08,988 INFO aiogram.dispatcher: Polling stopped for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-08 15:21:08,988 INFO aiogram.dispatcher: Polling stopped
+2025-11-08 15:25:45,115 INFO moder_telegram.app: Starting polling
+2025-11-08 15:25:45,116 INFO aiogram.dispatcher: Start polling
+2025-11-08 15:25:45,134 INFO aiogram.dispatcher: Run polling for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-08 15:27:13,065 INFO aiogram.event: Update id=868518949 is handled. Duration 40 ms by bot id=8347106464
+2025-11-08 15:27:58,345 INFO aiogram.event: Update id=868518950 is handled. Duration 0 ms by bot id=8347106464
+2025-11-08 15:29:20,530 INFO aiogram.event: Update id=868518951 is handled. Duration 0 ms by bot id=8347106464
+2025-11-08 15:30:22,224 WARNING aiogram.dispatcher: Received SIGINT signal
+2025-11-08 15:30:22,225 INFO aiogram.dispatcher: Polling stopped for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-08 15:30:22,225 INFO aiogram.dispatcher: Polling stopped
+2025-11-08 15:31:42,083 INFO moder_telegram.app: Starting polling
+2025-11-08 15:31:42,084 INFO aiogram.dispatcher: Start polling
+2025-11-08 15:31:42,114 INFO aiogram.dispatcher: Run polling for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-09 01:12:01,517 INFO moder_telegram.app: Starting polling
+2025-11-09 01:12:01,518 INFO aiogram.dispatcher: Start polling
+2025-11-09 01:12:01,561 INFO aiogram.dispatcher: Run polling for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-09 01:12:01,568 INFO aiogram.event: Update id=868518952 is handled. Duration 0 ms by bot id=8347106464
+2025-11-09 01:12:18,081 INFO aiogram.event: Update id=868518953 is handled. Duration 54 ms by bot id=8347106464
+2025-11-09 01:12:39,997 INFO aiogram.event: Update id=868518954 is handled. Duration 35 ms by bot id=8347106464
+2025-11-09 01:12:49,113 INFO aiogram.event: Update id=868518955 is handled. Duration 0 ms by bot id=8347106464
+2025-11-09 01:13:10,446 INFO aiogram.event: Update id=868518956 is handled. Duration 44 ms by bot id=8347106464
+2025-11-09 01:13:15,481 INFO aiogram.event: Update id=868518957 is handled. Duration 42 ms by bot id=8347106464
+2025-11-09 01:13:16,155 INFO aiogram.event: Update id=868518958 is handled. Duration 41 ms by bot id=8347106464
+2025-11-09 01:13:16,889 INFO aiogram.event: Update id=868518959 is handled. Duration 40 ms by bot id=8347106464
+2025-11-09 01:13:17,455 INFO aiogram.event: Update id=868518960 is handled. Duration 35 ms by bot id=8347106464
+2025-11-09 01:13:18,045 INFO aiogram.event: Update id=868518961 is handled. Duration 49 ms by bot id=8347106464
+2025-11-09 01:13:19,050 INFO aiogram.event: Update id=868518962 is handled. Duration 53 ms by bot id=8347106464
+2025-11-09 01:14:01,678 INFO moder_telegram.app: Admin 6209247387 warned user 6209247387 (total=1)
+2025-11-09 01:14:01,678 INFO aiogram.event: Update id=868518963 is handled. Duration 31 ms by bot id=8347106464
+2025-11-09 01:14:22,264 INFO aiogram.event: Update id=868518964 is handled. Duration 27 ms by bot id=8347106464
