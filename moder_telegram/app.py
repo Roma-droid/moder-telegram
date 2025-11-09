@@ -125,7 +125,8 @@ async def _on_message(message: Message) -> None:
     user_id = message.from_user.id if message.from_user else None
     if user_id is not None:
         # If banned or muted - delete message and optionally notify
-        if storage.is_banned(user_id, DB_PATH) or storage.is_muted(user_id, DB_PATH):
+        chat_id = message.chat.id if message.chat else 0
+        if storage.is_banned(user_id, chat_id, DB_PATH) or storage.is_muted(user_id, chat_id, DB_PATH):
             try:
                 await message.delete()
                 await message.answer("Пользователь заблокирован/замьючен модератором.")
@@ -166,8 +167,9 @@ async def _on_command(message: Message) -> None:
             await message.answer("Использование: /ban <user_id> [reason] или ответьте на сообщение и выполните /ban [reason]")
             return
 
-        storage.ban_user(target_uid, DB_PATH)
-        storage.log_action("ban", target_uid, user.id if user else None, details=reason, db_path=DB_PATH)
+    chat_id = message.chat.id if message.chat else 0
+    storage.ban_user(target_uid, chat_id=chat_id, db_path=DB_PATH)
+    storage.log_action("ban", target_uid, user.id if user else None, details=reason, chat_id=chat_id, db_path=DB_PATH)
 
         user_display = _user_display_from_message_user(replied_user) if replied_user else html.escape(f"user {target_uid}")
         admin_display = _user_display_from_message_user(user)
@@ -192,9 +194,10 @@ async def _on_command(message: Message) -> None:
             await message.answer("Использование: /warn <user_id> [reason] или ответьте на сообщение и выполните /warn [reason]")
             return
 
-        total = storage.warn_user(target_uid, DB_PATH)
-        details = (reason + f" (total={total})") if reason else f"total={total}"
-        storage.log_action("warn", target_uid, user.id if user else None, details=details, db_path=DB_PATH)
+    chat_id = message.chat.id if message.chat else 0
+    total = storage.warn_user(target_uid, chat_id=chat_id, db_path=DB_PATH)
+    details = (reason + f" (total={total})") if reason else f"total={total}"
+    storage.log_action("warn", target_uid, user.id if user else None, details=details, chat_id=chat_id, db_path=DB_PATH)
 
         user_display = _user_display_from_message_user(replied_user) if replied_user else html.escape(f"user {target_uid}")
         admin_display = _user_display_from_message_user(user)
@@ -215,7 +218,8 @@ async def _on_command(message: Message) -> None:
 
     # /stats
     if cmd == "/stats":
-        total_banned, total_warned = storage.get_stats(DB_PATH)
+        chat_id = message.chat.id if message.chat else None
+        total_banned, total_warned = storage.get_stats(db_path=DB_PATH, chat_id=chat_id)
         await message.answer(f"Banned: {total_banned}, Warned: {total_warned}")
         return
 
@@ -226,8 +230,9 @@ async def _on_command(message: Message) -> None:
             await message.answer("Использование: /unban <user_id> [reason] или ответьте на сообщение и выполните /unban [reason]")
             return
 
-        storage.unban_user(target_uid, DB_PATH)
-        storage.log_action("unban", target_uid, user.id if user else None, details=reason, db_path=DB_PATH)
+    chat_id = message.chat.id if message.chat else 0
+    storage.unban_user(target_uid, chat_id=chat_id, db_path=DB_PATH)
+    storage.log_action("unban", target_uid, user.id if user else None, details=reason, chat_id=chat_id, db_path=DB_PATH)
 
         user_display = _user_display_from_message_user(replied_user) if replied_user else html.escape(f"user {target_uid}")
         admin_display = _user_display_from_message_user(user)
@@ -252,8 +257,9 @@ async def _on_command(message: Message) -> None:
             await message.answer("Использование: /mute <user_id> [reason] или ответьте на сообщение и выполните /mute [reason]")
             return
 
-        storage.mute_user(target_uid, DB_PATH)
-        storage.log_action("mute", target_uid, user.id if user else None, details=reason, db_path=DB_PATH)
+    chat_id = message.chat.id if message.chat else 0
+    storage.mute_user(target_uid, chat_id=chat_id, db_path=DB_PATH)
+    storage.log_action("mute", target_uid, user.id if user else None, details=reason, chat_id=chat_id, db_path=DB_PATH)
 
         user_display = _user_display_from_message_user(replied_user) if replied_user else html.escape(f"user {target_uid}")
         admin_display = _user_display_from_message_user(user)
@@ -278,8 +284,9 @@ async def _on_command(message: Message) -> None:
             await message.answer("Использование: /unmute <user_id> [reason] или ответьте на сообщение и выполните /unmute [reason]")
             return
 
-        storage.unmute_user(target_uid, DB_PATH)
-        storage.log_action("unmute", target_uid, user.id if user else None, details=reason, db_path=DB_PATH)
+    chat_id = message.chat.id if message.chat else 0
+    storage.unmute_user(target_uid, chat_id=chat_id, db_path=DB_PATH)
+    storage.log_action("unmute", target_uid, user.id if user else None, details=reason, chat_id=chat_id, db_path=DB_PATH)
 
         user_display = _user_display_from_message_user(replied_user) if replied_user else html.escape(f"user {target_uid}")
         admin_display = _user_display_from_message_user(user)
@@ -313,7 +320,8 @@ async def _on_command(message: Message) -> None:
             await message.answer("Использование: /audit <user_id> или ответьте на сообщение пользователя и выполните /audit")
             return
 
-        rows = storage.get_audit(target_uid, db_path=DB_PATH)
+    chat_id = message.chat.id if message.chat else None
+    rows = storage.get_audit(target_uid, chat_id=chat_id, db_path=DB_PATH)
         if not rows:
             await message.answer("Нет записей аудита для этого пользователя.")
             return
