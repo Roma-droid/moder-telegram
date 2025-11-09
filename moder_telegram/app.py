@@ -156,165 +156,196 @@ async def _on_command(message: Message) -> None:
         await message.answer("Только администраторы могут использовать эту команду.")
         return
 
-    if cmd == "/ban":
-        # Allow ban by reply: admin replies to a user's message and sends /ban
-        target_uid = None
-        if message.reply_to_message and message.reply_to_message.from_user:
-            target_uid = message.reply_to_message.from_user.id
-        elif len(parts) >= 2:
-            try:
-                target_uid = int(parts[1])
-            except ValueError:
-                await message.answer("Неверный user_id")
-                return
-
-        if target_uid is None:
-            await message.answer("Использование: /ban <user_id> или ответьте на сообщение пользователя и выполните /ban")
-            return
-
-        storage.ban_user(target_uid, DB_PATH)
-        # record audit and notify audit chats
-        storage.log_action("ban", target_uid, user.id if user else None, details=None, db_path=DB_PATH)
-        for chat_id in _get_audit_chats():
-            try:
-                await message.bot.send_message(chat_id, f"[Audit] Admin {user.id} banned user {target_uid}")
-            except Exception:
-                logger.exception("Failed to send audit message to chat %s", chat_id)
-        await message.answer(f"Пользователь {target_uid} заблокирован.")
-        logger.info("Admin %s banned user %s", user.id, target_uid)
-
     elif cmd == "/warn":
-        # Allow warn by reply as well
-        target_uid = None
-        if message.reply_to_message and message.reply_to_message.from_user:
-            target_uid = message.reply_to_message.from_user.id
-        elif len(parts) >= 2:
-            try:
-                target_uid = int(parts[1])
-            except ValueError:
-                await message.answer("Неверный user_id")
-                return
-
+        target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
         if target_uid is None:
-            await message.answer("Использование: /warn <user_id> или ответьте на сообщение пользователя и выполните /warn")
+            await message.answer("Использование: /warn <user_id> [reason] или ответьте на сообщение пользователя и выполните /warn [reason]")
             return
 
         total = storage.warn_user(target_uid, DB_PATH)
-        storage.log_action("warn", target_uid, user.id if user else None, details=f"total={total}", db_path=DB_PATH)
-        for chat_id in _get_audit_chats():
-            try:
-                await message.bot.send_message(chat_id, f"[Audit] Admin {user.id} warned user {target_uid} (total={total})")
-            except Exception:
-                logger.exception("Failed to send audit message to chat %s", chat_id)
-        await message.answer(f"Пользователь {target_uid} получил предупреждение (total={total}).")
-        logger.info("Admin %s warned user %s (total=%s)", user.id, target_uid, total)
+        details = (reason + f" (total={total})") if reason else f"total={total}"
+        storage.log_action("warn", target_uid, user.id if user else None, details=details, db_path=DB_PATH)
+        user_display = _user_display_from_message_user(replied_user) if replied_user else html.escape(f"user {target_uid}")
+        admin_display = _user_display_from_message_user(user)
+        ts = datetime.now(timezone.utc).isoformat()
+        text = (
+            f"<b>Action:</b> warn\n"
+            f"<b>User:</b> <a href=\"tg://user?id={target_uid}\">{user_display}</a> (id: {target_uid})\n"
+            f"<b>Admin:</b> <a href=\"tg://user?id={user.id}\">{admin_display}</a> (id: {user.id})\n"
+            f"<b>Time (UTC):</b> {html.escape(ts)}\n"
+            f"<b>Total warns:</b> {total}\n"
+        )
+            """Handle admin commands with optional reasons and audit notifications.
 
-    elif cmd == "/stats":
-        total_banned, total_warned = storage.get_stats(DB_PATH)
-        await message.answer(f"Banned: {total_banned}, Warned: {total_warned}")
-
-    elif cmd == "/unban":
-        # Allow unban by reply or by id
-        target_uid = None
-        if message.reply_to_message and message.reply_to_message.from_user:
-            target_uid = message.reply_to_message.from_user.id
-        elif len(parts) >= 2:
-            try:
-                target_uid = int(parts[1])
-            except ValueError:
-                await message.answer("Неверный user_id")
+            Supported commands:
+            - /ban <user_id> [reason] or reply + /ban [reason]
+            - /warn <user_id> [reason] or reply + /warn [reason]
+            - /mute /unmute /unban similarly
+            - /stats
+            - /audit <user_id> or reply + /audit
+            """
+            text = (message.text or "").strip()
+            if not text:
+                return
+            parts = text.split()
+            cmd = parts[0].lower()
+            user = message.from_user
+            admins = _get_admins()
+            if user is None or user.id not in admins:
+                await message.answer("Только администраторы могут использовать эту команду.")
                 return
 
-        if target_uid is None:
-            await message.answer("Использование: /unban <user_id> или ответьте на сообщение пользователя и выполните /unban")
-            return
+            if cmd == "/ban":
+                target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
+                if target_uid is None:
+                    await message.answer("Использование: /ban <user_id> [reason] или ответьте на сообщение пользователя и выполните /ban [reason]")
+                    return
 
-        storage.unban_user(target_uid, DB_PATH)
-        storage.log_action("unban", target_uid, user.id if user else None, db_path=DB_PATH)
-        for chat_id in _get_audit_chats():
-            try:
-                await message.bot.send_message(chat_id, f"[Audit] Admin {user.id} unbanned user {target_uid}")
-            except Exception:
-                logger.exception("Failed to send audit message to chat %s", chat_id)
-        await message.answer(f"Пользователь {target_uid} разблокирован.")
-        logger.info("Admin %s unbanned user %s", user.id, target_uid)
+                storage.ban_user(target_uid, DB_PATH)
+                storage.log_action("ban", target_uid, user.id if user else None, details=reason, db_path=DB_PATH)
+                user_display = _user_display_from_message_user(replied_user) if replied_user else html.escape(f"user {target_uid}")
+                admin_display = _user_display_from_message_user(user)
+                ts = datetime.now(timezone.utc).isoformat()
+                text = (
+                    f"<b>Action:</b> ban\n"
+                    f"<b>User:</b> <a href=\"tg://user?id={target_uid}\">{user_display}</a> (id: {target_uid})\n"
+                    f"<b>Admin:</b> <a href=\"tg://user?id={user.id}\">{admin_display}</a> (id: {user.id})\n"
+                    f"<b>Time (UTC):</b> {html.escape(ts)}\n"
+                )
+                if reason:
+                    text += f"<b>Reason:</b> {html.escape(reason)}\n"
+                _notify_audit_chats_fire_and_forget(message, text)
+                await message.answer(f"Пользователь {target_uid} заблокирован.")
+                logger.info("Admin %s banned user %s", user.id, target_uid)
 
-    elif cmd == "/mute":
-        # Allow mute by reply or by id
-        target_uid = None
-        if message.reply_to_message and message.reply_to_message.from_user:
-            target_uid = message.reply_to_message.from_user.id
-        elif len(parts) >= 2:
-            try:
-                target_uid = int(parts[1])
-            except ValueError:
-                await message.answer("Неверный user_id")
-                return
+            elif cmd == "/warn":
+                target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
+                if target_uid is None:
+                    await message.answer("Использование: /warn <user_id> [reason] или ответьте на сообщение пользователя и выполните /warn [reason]")
+                    return
 
-        if target_uid is None:
-            await message.answer("Использование: /mute <user_id> или ответьте на сообщение пользователя и выполните /mute")
-            return
+                total = storage.warn_user(target_uid, DB_PATH)
+                details = (reason + f" (total={total})") if reason else f"total={total}"
+                storage.log_action("warn", target_uid, user.id if user else None, details=details, db_path=DB_PATH)
+                user_display = _user_display_from_message_user(replied_user) if replied_user else html.escape(f"user {target_uid}")
+                admin_display = _user_display_from_message_user(user)
+                ts = datetime.now(timezone.utc).isoformat()
+                text = (
+                    f"<b>Action:</b> warn\n"
+                    f"<b>User:</b> <a href=\"tg://user?id={target_uid}\">{user_display}</a> (id: {target_uid})\n"
+                    f"<b>Admin:</b> <a href=\"tg://user?id={user.id}\">{admin_display}</a> (id: {user.id})\n"
+                    f"<b>Time (UTC):</b> {html.escape(ts)}\n"
+                    f"<b>Total warns:</b> {total}\n"
+                )
+                if reason:
+                    text += f"<b>Reason:</b> {html.escape(reason)}\n"
+                _notify_audit_chats_fire_and_forget(message, text)
+                await message.answer(f"Пользователь {target_uid} получил предупреждение (total={total}).")
+                logger.info("Admin %s warned user %s (total=%s)", user.id, target_uid, total)
 
-        storage.mute_user(target_uid, DB_PATH)
-        storage.log_action("mute", target_uid, user.id if user else None, db_path=DB_PATH)
-        for chat_id in _get_audit_chats():
-            try:
-                await message.bot.send_message(chat_id, f"[Audit] Admin {user.id} muted user {target_uid}")
-            except Exception:
-                logger.exception("Failed to send audit message to chat %s", chat_id)
-        await message.answer(f"Пользователь {target_uid} заглушён (muted).")
-        logger.info("Admin %s muted user %s", user.id, target_uid)
+            elif cmd == "/stats":
+                total_banned, total_warned = storage.get_stats(DB_PATH)
+                await message.answer(f"Banned: {total_banned}, Warned: {total_warned}")
 
-    elif cmd == "/unmute":
-        # Allow unmute by reply or by id
-        target_uid = None
-        if message.reply_to_message and message.reply_to_message.from_user:
-            target_uid = message.reply_to_message.from_user.id
-        elif len(parts) >= 2:
-            try:
-                target_uid = int(parts[1])
-            except ValueError:
-                await message.answer("Неверный user_id")
-                return
+            elif cmd == "/unban":
+                target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
+                if target_uid is None:
+                    await message.answer("Использование: /unban <user_id> [reason] или ответьте на сообщение пользователя и выполните /unban [reason]")
+                    return
 
-        if target_uid is None:
-            await message.answer("Использование: /unmute <user_id> или ответьте на сообщение пользователя и выполните /unmute")
-            return
+                storage.unban_user(target_uid, DB_PATH)
+                storage.log_action("unban", target_uid, user.id if user else None, details=reason, db_path=DB_PATH)
+                user_display = _user_display_from_message_user(replied_user) if replied_user else html.escape(f"user {target_uid}")
+                admin_display = _user_display_from_message_user(user)
+                ts = datetime.now(timezone.utc).isoformat()
+                text = (
+                    f"<b>Action:</b> unban\n"
+                    f"<b>User:</b> <a href=\"tg://user?id={target_uid}\">{user_display}</a> (id: {target_uid})\n"
+                    f"<b>Admin:</b> <a href=\"tg://user?id={user.id}\">{admin_display}</a> (id: {user.id})\n"
+                    f"<b>Time (UTC):</b> {html.escape(ts)}\n"
+                )
+                if reason:
+                    text += f"<b>Reason:</b> {html.escape(reason)}\n"
+                _notify_audit_chats_fire_and_forget(message, text)
+                await message.answer(f"Пользователь {target_uid} разблокирован.")
+                logger.info("Admin %s unbanned user %s", user.id, target_uid)
 
-        storage.unmute_user(target_uid, DB_PATH)
-        storage.log_action("unmute", target_uid, user.id if user else None, db_path=DB_PATH)
-        for chat_id in _get_audit_chats():
-            try:
-                await message.bot.send_message(chat_id, f"[Audit] Admin {user.id} unmuted user {target_uid}")
-            except Exception:
-                logger.exception("Failed to send audit message to chat %s", chat_id)
-        await message.answer(f"Пользователь {target_uid} размьючен (unmuted).")
-        logger.info("Admin %s unmuted user %s", user.id, target_uid)
+            elif cmd == "/mute":
+                target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
+                if target_uid is None:
+                    await message.answer("Использование: /mute <user_id> [reason] или ответьте на сообщение пользователя и выполните /mute [reason]")
+                    return
 
+                storage.mute_user(target_uid, DB_PATH)
+                storage.log_action("mute", target_uid, user.id if user else None, details=reason, db_path=DB_PATH)
+                user_display = _user_display_from_message_user(replied_user) if replied_user else html.escape(f"user {target_uid}")
+                admin_display = _user_display_from_message_user(user)
+                ts = datetime.now(timezone.utc).isoformat()
+                text = (
+                    f"<b>Action:</b> mute\n"
+                    f"<b>User:</b> <a href=\"tg://user?id={target_uid}\">{user_display}</a> (id: {target_uid})\n"
+                    f"<b>Admin:</b> <a href=\"tg://user?id={user.id}\">{admin_display}</a> (id: {user.id})\n"
+                    f"<b>Time (UTC):</b> {html.escape(ts)}\n"
+                )
+                if reason:
+                    text += f"<b>Reason:</b> {html.escape(reason)}\n"
+                _notify_audit_chats_fire_and_forget(message, text)
+                await message.answer(f"Пользователь {target_uid} заглушён (muted).")
+                logger.info("Admin %s muted user %s", user.id, target_uid)
 
-async def _run_async(token: str) -> None:
-    bot = Bot(token=token)
-    dp = Dispatcher()
+            elif cmd == "/unmute":
+                target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
+                if target_uid is None:
+                    await message.answer("Использование: /unmute <user_id> [reason] или ответьте на сообщение пользователя и выполните /unmute [reason]")
+                    return
 
-    # Register handlers
-    dp.message.register(_on_command, lambda message: (message.text or "").startswith('/'))
-    dp.message.register(_on_message)
+                storage.unmute_user(target_uid, DB_PATH)
+                storage.log_action("unmute", target_uid, user.id if user else None, details=reason, db_path=DB_PATH)
+                user_display = _user_display_from_message_user(replied_user) if replied_user else html.escape(f"user {target_uid}")
+                admin_display = _user_display_from_message_user(user)
+                ts = datetime.now(timezone.utc).isoformat()
+                text = (
+                    f"<b>Action:</b> unmute\n"
+                    f"<b>User:</b> <a href=\"tg://user?id={target_uid}\">{user_display}</a> (id: {target_uid})\n"
+                    f"<b>Admin:</b> <a href=\"tg://user?id={user.id}\">{admin_display}</a> (id: {user.id})\n"
+                    f"<b>Time (UTC):</b> {html.escape(ts)}\n"
+                )
+                if reason:
+                    text += f"<b>Reason:</b> {html.escape(reason)}\n"
+                _notify_audit_chats_fire_and_forget(message, text)
+                await message.answer(f"Пользователь {target_uid} размьючен (unmuted).")
+                logger.info("Admin %s unmuted user %s", user.id, target_uid)
 
-    logger.info("Starting polling")
-    # start_polling takes bot as an argument in aiogram v3
-    await dp.start_polling(bot)
+            elif cmd == "/audit":
+                # Show audit history for user (reply or id)
+                target_uid = None
+                if message.reply_to_message and message.reply_to_message.from_user:
+                    target_uid = message.reply_to_message.from_user.id
+                elif len(parts) >= 2:
+                    try:
+                        target_uid = int(parts[1])
+                    except ValueError:
+                        await message.answer("Неверный user_id")
+                        return
 
+                if target_uid is None:
+                    await message.answer("Использование: /audit <user_id> или ответьте на сообщение пользователя и выполните /audit")
+                    return
 
-def _configure_logging(log_path: str = "moder_telegram.log") -> None:
-    root = logging.getLogger()
-    if root.handlers:
-        # avoid adding duplicate handlers in tests or repeated runs
-        return
-    root.setLevel(logging.INFO)
-    fmt = logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
-    # Console handler
-    ch = logging.StreamHandler()
-    ch.setFormatter(fmt)
+                rows = storage.get_audit(target_uid, db_path=DB_PATH)
+                if not rows:
+                    await message.answer("Нет записей аудита для этого пользователя.")
+                    return
+
+                # format rows
+                lines = []
+                for r in rows[:20]:
+                    _id, action, uid, admin_id, ts, details = r
+                    admin_txt = f"{admin_id}" if admin_id is not None else "-"
+                    details_txt = html.escape(details) if details else ""
+                    lines.append(f"{html.escape(ts)} — <b>{html.escape(action)}</b> by {html.escape(str(admin_txt))} {details_txt}")
+
+                await message.answer("\n".join(lines), parse_mode="HTML")
     root.addHandler(ch)
     # Rotating file handler
     fh = RotatingFileHandler(log_path, maxBytes=1_000_000, backupCount=5, encoding="utf-8")
