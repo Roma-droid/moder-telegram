@@ -230,6 +230,20 @@ async def _on_command(message: Message) -> None:
     # /ban
     if cmd == "/ban":
         target_uid, reason, replied_user = await _resolve_target_and_reason(parts, message)
+        # Support optional explicit username argument: /ban <user_id> @username [reason]
+        username_arg: Optional[str] = None
+        if not replied_user and len(parts) >= 3:
+            # If the command used numeric id as first arg and second arg looks like username
+            # treat parts[2] as username and shift reason accordingly.
+            try:
+                # if parts[1] is numeric and parts[2] starts with @ -> username provided
+                int(parts[1])
+                if parts[2].startswith("@"):
+                    username_arg = parts[2].lstrip("@")
+                    reason = " ".join(parts[3:]).strip() or None
+            except ValueError:
+                # parts[1] was not numeric, leave as-is
+                pass
         if target_uid is None:
             await message.answer("Использование: /ban <user_id> [reason] или ответьте на сообщение и выполните /ban [reason]")
             return
@@ -237,7 +251,12 @@ async def _on_command(message: Message) -> None:
         storage.ban_user(target_uid, DB_PATH)
         storage.log_action("ban", target_uid, user.id if user else None, details=reason, db_path=DB_PATH)
 
-        user_display = _user_display_from_message_user(replied_user) if replied_user else html.escape(f"user {target_uid}")
+        if replied_user:
+            user_display = _user_display_from_message_user(replied_user)
+        elif username_arg:
+            user_display = html.escape(f"@{username_arg}")
+        else:
+            user_display = html.escape(f"user {target_uid}")
         admin_display = _user_display_from_message_user(user)
         ts = datetime.now(timezone.utc).isoformat()
         text_fmt = (
@@ -248,8 +267,11 @@ async def _on_command(message: Message) -> None:
         )
         if reason:
             text_fmt += f"<b>Reason:</b> {html.escape(reason)}\n"
+        if username_arg:
+            # record provided username in audit details as well
+            text_fmt += f"<b>Provided username:</b> {html.escape('@' + username_arg)}\n"
         _notify_audit_chats_fire_and_forget(message, text_fmt)
-        await message.answer(f"Пользователь {target_uid} заблокирован.")
+        await message.answer(f"Пользователь {username_arg or target_uid} заблокирован.")
         logger.info("Admin %s banned user %s", user.id, target_uid)
         return
 
@@ -316,6 +338,16 @@ async def _on_command(message: Message) -> None:
     # /mute
     if cmd == "/mute":
         target_uid, reason, replied_user = await _resolve_target_and_reason(parts, message)
+        # Support optional explicit username argument: /mute <user_id> @username [reason]
+        username_arg: Optional[str] = None
+        if not replied_user and len(parts) >= 3:
+            try:
+                int(parts[1])
+                if parts[2].startswith("@"):
+                    username_arg = parts[2].lstrip("@")
+                    reason = " ".join(parts[3:]).strip() or None
+            except ValueError:
+                pass
         if target_uid is None:
             await message.answer("Использование: /mute <user_id> [reason] или ответьте на сообщение и выполните /mute [reason]")
             return
@@ -323,7 +355,12 @@ async def _on_command(message: Message) -> None:
         storage.mute_user(target_uid, DB_PATH)
         storage.log_action("mute", target_uid, user.id if user else None, details=reason, db_path=DB_PATH)
 
-        user_display = _user_display_from_message_user(replied_user) if replied_user else html.escape(f"user {target_uid}")
+        if replied_user:
+            user_display = _user_display_from_message_user(replied_user)
+        elif username_arg:
+            user_display = html.escape(f"@{username_arg}")
+        else:
+            user_display = html.escape(f"user {target_uid}")
         admin_display = _user_display_from_message_user(user)
         ts = datetime.now(timezone.utc).isoformat()
         text_fmt = (
@@ -334,8 +371,10 @@ async def _on_command(message: Message) -> None:
         )
         if reason:
             text_fmt += f"<b>Reason:</b> {html.escape(reason)}\n"
+        if username_arg:
+            text_fmt += f"<b>Provided username:</b> {html.escape('@' + username_arg)}\n"
         _notify_audit_chats_fire_and_forget(message, text_fmt)
-        await message.answer(f"Пользователь {target_uid} заглушён (muted).")
+        await message.answer(f"Пользователь {username_arg or target_uid} заглушён (muted).")
         logger.info("Admin %s muted user %s", user.id, target_uid)
         return
 
