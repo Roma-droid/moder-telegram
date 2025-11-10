@@ -76,12 +76,13 @@ def _user_display_from_message_user(u) -> str:
     return html.escape(str(getattr(u, "id", "user")))
 
 
-async def _extract_target_and_reason(parts: list[str], message: Message) -> tuple[Optional[int], Optional[str], Optional[object]]:
+def _extract_target_and_reason(parts: list[str], message: Message) -> tuple[Optional[int], Optional[str], Optional[object]]:
     """Return (target_uid, reason, replied_user).
 
-    Supports numeric id, reply-to-message target, and username (with or
-    without leading @). Username resolution is attempted via Bot.get_chat().
-    Returns (None, None, None) when parsing/resolution fails.
+    - If command is sent as a reply: target comes from replied message author and
+      reason is the remainder of parts after the command (if any).
+    - Otherwise, expects: /cmd <user_id> [reason...]
+    - Returns (None, None, None) when parsing fails (invalid id).
     """
     target_uid: Optional[int] = None
     reason: Optional[str] = None
@@ -93,20 +94,10 @@ async def _extract_target_and_reason(parts: list[str], message: Message) -> tupl
         if len(parts) >= 2:
             reason = " ".join(parts[1:]).strip() or None
     elif len(parts) >= 2:
-        raw = parts[1]
-        # try integer id first
         try:
-            target_uid = int(raw)
+            target_uid = int(parts[1])
         except ValueError:
-            # try resolve username via Telegram API
-            uname = raw if raw.startswith("@") else f"@{raw}"
-            try:
-                chat = await message.bot.get_chat(uname)
-                target_uid = chat.id
-            except Exception:
-                # resolution failed
-                return None, None, None
-
+            return None, None, None
         if len(parts) >= 3:
             reason = " ".join(parts[2:]).strip() or None
 
@@ -199,7 +190,7 @@ async def _on_command(message: Message) -> None:
 
     # /ban
     if cmd == "/ban":
-        target_uid, reason, replied_user = await _extract_target_and_reason(parts, message)
+        target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
         if target_uid is None:
             await message.answer("Использование: /ban <user_id> [reason] или ответьте на сообщение и выполните /ban [reason]")
             return
@@ -225,7 +216,7 @@ async def _on_command(message: Message) -> None:
 
     # /warn
     if cmd == "/warn":
-        target_uid, reason, replied_user = await _extract_target_and_reason(parts, message)
+        target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
         if target_uid is None:
             await message.answer("Использование: /warn <user_id> [reason] или ответьте на сообщение и выполните /warn [reason]")
             return
@@ -259,7 +250,7 @@ async def _on_command(message: Message) -> None:
 
     # /unban
     if cmd == "/unban":
-        target_uid, reason, replied_user = await _extract_target_and_reason(parts, message)
+        target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
         if target_uid is None:
             await message.answer("Использование: /unban <user_id> [reason] или ответьте на сообщение и выполните /unban [reason]")
             return
@@ -285,7 +276,7 @@ async def _on_command(message: Message) -> None:
 
     # /mute
     if cmd == "/mute":
-        target_uid, reason, replied_user = await _extract_target_and_reason(parts, message)
+        target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
         if target_uid is None:
             await message.answer("Использование: /mute <user_id> [reason] или ответьте на сообщение и выполните /mute [reason]")
             return
@@ -311,7 +302,7 @@ async def _on_command(message: Message) -> None:
 
     # /unmute
     if cmd == "/unmute":
-        target_uid, reason, replied_user = await _extract_target_and_reason(parts, message)
+        target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
         if target_uid is None:
             await message.answer("Использование: /unmute <user_id> [reason] или ответьте на сообщение и выполните /unmute [reason]")
             return
