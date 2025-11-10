@@ -31,6 +31,7 @@ logger = logging.getLogger(__name__)
 DB_PATH = os.environ.get("DB_PATH", None)
 AUDIT_CHAT_IDS_RAW = os.environ.get("AUDIT_CHAT_IDS", "")
 MODERATION_CHAT_IDS_RAW = os.environ.get("MODERATION_CHAT_IDS", "")
+AUTO_DELETE_SECONDS = int(os.environ.get("AUTO_DELETE_SECONDS", "0"))
 
 
 def _get_audit_chats() -> list[int]:
@@ -150,6 +151,29 @@ async def _safe_send_audit(chat_id: int, text: str, bot: Bot) -> None:
         logger.exception("Failed to send audit message to chat %s", chat_id)
 
 
+async def _reply_with_optional_delete(orig_message: Message, text: str, parse_mode: Optional[str] = None) -> None:
+    """Send a reply/answer and optionally delete the sent bot message after AUTO_DELETE_SECONDS.
+
+    This helper preserves existing behaviour if AUTO_DELETE_SECONDS is 0 or unset.
+    """
+    try:
+        sent = await orig_message.answer(text, parse_mode=parse_mode)
+    except Exception:
+        logger.exception("Failed to send reply message")
+        return
+
+    # Schedule auto-delete if configured
+    if AUTO_DELETE_SECONDS and AUTO_DELETE_SECONDS > 0:
+        async def _del_after(m):
+            await asyncio.sleep(AUTO_DELETE_SECONDS)
+            try:
+                await m.delete()
+            except Exception:
+                logger.debug("Auto-delete failed for bot message", exc_info=True)
+
+        asyncio.create_task(_del_after(sent))
+
+
 def _notify_audit_chats_fire_and_forget(message: Message, text: str) -> None:
     """Schedule sending audit notifications to configured chats without awaiting them."""
     bot = message.bot
@@ -182,7 +206,7 @@ async def _on_message(message: Message) -> None:
         if storage.is_banned(user_id, DB_PATH) or storage.is_muted(user_id, DB_PATH):
             try:
                 await message.delete()
-                await message.answer("Пользователь заблокирован/замьючен модератором.")
+                await _reply_with_optional_delete(message, "Пользователь заблокирован/замьючен модератором.")
             except Exception:
                 logger.exception("Failed to delete message from moderated user")
             return
@@ -191,7 +215,7 @@ async def _on_message(message: Message) -> None:
     if is_bad_message(text):
         try:
             await message.delete()
-            await message.answer("Сообщение удалено: нарушение правил модерации.")
+            await _reply_with_optional_delete(message, "Сообщение удалено: нарушение правил модерации.")
         except Exception:
             logger.exception("Failed to moderate message")
 
@@ -210,7 +234,7 @@ async def _on_command(message: Message) -> None:
     user = message.from_user
     admins = _get_admins()
     if user is None or user.id not in admins:
-        await message.answer("Только администраторы могут использовать эту команду.")
+        await _reply_with_optional_delete(message, "Только администраторы могут использовать эту команду.")
         return
 
     # Restrict certain moderation commands to configured moderation group(s)
@@ -222,8 +246,9 @@ async def _on_command(message: Message) -> None:
             chat = getattr(message, "chat", None)
             chat_id = getattr(chat, "id", None)
             if chat_id not in allowed:
-                await message.answer(
-                    "Команды /ban, /warn и /mute доступны только в модерационной группе."
+                await _reply_with_optional_delete(
+                    message,
+                    "Команды /ban, /warn и /mute доступны только в модерационной группе.",
                 )
                 return
 
@@ -245,7 +270,7 @@ async def _on_command(message: Message) -> None:
                 # parts[1] was not numeric, leave as-is
                 pass
         if target_uid is None:
-            await message.answer("Использование: /ban <user_id> [reason] или ответьте на сообщение и выполните /ban [reason]")
+            await _reply_with_optional_delete(message, "Использование: /ban <user_id> [reason] или ответьте на сообщение и выполните /ban [reason]")
             return
 
         storage.ban_user(target_uid, DB_PATH)
@@ -271,7 +296,7 @@ async def _on_command(message: Message) -> None:
             # record provided username in audit details as well
             text_fmt += f"<b>Provided username:</b> {html.escape('@' + username_arg)}\n"
         _notify_audit_chats_fire_and_forget(message, text_fmt)
-        await message.answer(f"Пользователь {username_arg or target_uid} заблокирован.")
+        await _reply_with_optional_delete(message, f"Пользователь {username_arg or target_uid} заблокирован.")
         logger.info("Admin %s banned user %s", user.id, target_uid)
         return
 
@@ -279,7 +304,7 @@ async def _on_command(message: Message) -> None:
     if cmd == "/warn":
         target_uid, reason, replied_user = await _resolve_target_and_reason(parts, message)
         if target_uid is None:
-            await message.answer("Использование: /warn <user_id> [reason] или ответьте на сообщение и выполните /warn [reason]")
+            await _reply_with_optional_delete(message, "Использование: /warn <user_id> [reason] или ответьте на сообщение и выполните /warn [reason]")
             return
 
         total = storage.warn_user(target_uid, DB_PATH)
@@ -299,21 +324,21 @@ async def _on_command(message: Message) -> None:
         if reason:
             text_fmt += f"<b>Reason:</b> {html.escape(reason)}\n"
         _notify_audit_chats_fire_and_forget(message, text_fmt)
-        await message.answer(f"Пользователь {target_uid} получил предупреждение (total={total}).")
+        await _reply_with_optional_delete(message, f"Пользователь {target_uid} получил предупреждение (total={total}).")
         logger.info("Admin %s warned user %s (total=%s)", user.id, target_uid, total)
         return
 
     # /stats
     if cmd == "/stats":
         total_banned, total_warned = storage.get_stats(DB_PATH)
-        await message.answer(f"Banned: {total_banned}, Warned: {total_warned}")
+        await _reply_with_optional_delete(message, f"Banned: {total_banned}, Warned: {total_warned}")
         return
 
     # /unban
     if cmd == "/unban":
         target_uid, reason, replied_user = await _resolve_target_and_reason(parts, message)
         if target_uid is None:
-            await message.answer("Использование: /unban <user_id> [reason] или ответьте на сообщение и выполните /unban [reason]")
+            await _reply_with_optional_delete(message, "Использование: /unban <user_id> [reason] или ответьте на сообщение и выполните /unban [reason]")
             return
 
         storage.unban_user(target_uid, DB_PATH)
@@ -331,7 +356,7 @@ async def _on_command(message: Message) -> None:
         if reason:
             text_fmt += f"<b>Reason:</b> {html.escape(reason)}\n"
         _notify_audit_chats_fire_and_forget(message, text_fmt)
-        await message.answer(f"Пользователь {target_uid} разблокирован.")
+        await _reply_with_optional_delete(message, f"Пользователь {target_uid} разблокирован.")
         logger.info("Admin %s unbanned user %s", user.id, target_uid)
         return
 
@@ -349,7 +374,7 @@ async def _on_command(message: Message) -> None:
             except ValueError:
                 pass
         if target_uid is None:
-            await message.answer("Использование: /mute <user_id> [reason] или ответьте на сообщение и выполните /mute [reason]")
+            await _reply_with_optional_delete(message, "Использование: /mute <user_id> [reason] или ответьте на сообщение и выполните /mute [reason]")
             return
 
         storage.mute_user(target_uid, DB_PATH)
@@ -374,7 +399,7 @@ async def _on_command(message: Message) -> None:
         if username_arg:
             text_fmt += f"<b>Provided username:</b> {html.escape('@' + username_arg)}\n"
         _notify_audit_chats_fire_and_forget(message, text_fmt)
-        await message.answer(f"Пользователь {username_arg or target_uid} заглушён (muted).")
+        await _reply_with_optional_delete(message, f"Пользователь {username_arg or target_uid} заглушён (muted).")
         logger.info("Admin %s muted user %s", user.id, target_uid)
         return
 
@@ -382,7 +407,7 @@ async def _on_command(message: Message) -> None:
     if cmd == "/unmute":
         target_uid, reason, replied_user = await _resolve_target_and_reason(parts, message)
         if target_uid is None:
-            await message.answer("Использование: /unmute <user_id> [reason] или ответьте на сообщение и выполните /unmute [reason]")
+            await _reply_with_optional_delete(message, "Использование: /unmute <user_id> [reason] или ответьте на сообщение и выполните /unmute [reason]")
             return
 
         storage.unmute_user(target_uid, DB_PATH)
@@ -400,7 +425,7 @@ async def _on_command(message: Message) -> None:
         if reason:
             text_fmt += f"<b>Reason:</b> {html.escape(reason)}\n"
         _notify_audit_chats_fire_and_forget(message, text_fmt)
-        await message.answer(f"Пользователь {target_uid} размьючен (unmuted).")
+        await _reply_with_optional_delete(message, f"Пользователь {target_uid} размьючен (unmuted).")
         logger.info("Admin %s unmuted user %s", user.id, target_uid)
         return
 
@@ -413,16 +438,16 @@ async def _on_command(message: Message) -> None:
             try:
                 target_uid = int(parts[1])
             except ValueError:
-                await message.answer("Неверный user_id")
+                await _reply_with_optional_delete(message, "Неверный user_id")
                 return
 
         if target_uid is None:
-            await message.answer("Использование: /audit <user_id> или ответьте на сообщение пользователя и выполните /audit")
+            await _reply_with_optional_delete(message, "Использование: /audit <user_id> или ответьте на сообщение пользователя и выполните /audit")
             return
 
         rows = storage.get_audit(target_uid, db_path=DB_PATH)
         if not rows:
-            await message.answer("Нет записей аудита для этого пользователя.")
+            await _reply_with_optional_delete(message, "Нет записей аудита для этого пользователя.")
             return
 
         lines: list[str] = []
@@ -432,7 +457,7 @@ async def _on_command(message: Message) -> None:
             details_txt = html.escape(details) if details else ""
             lines.append(f"{html.escape(ts)} — <b>{html.escape(action)}</b> by {html.escape(str(admin_txt))} {details_txt}")
 
-        await message.answer("\n".join(lines), parse_mode="HTML")
+    await _reply_with_optional_delete(message, "\n".join(lines), parse_mode="HTML")
 
 
 async def _run_async(token: str) -> None:

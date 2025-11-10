@@ -98,3 +98,73 @@
 2025-11-10 14:00:02,145 WARNING aiogram.dispatcher: Received SIGINT signal
 2025-11-10 14:00:02,146 INFO aiogram.dispatcher: Polling stopped for bot @moderator225_bot id=8347106464 - 'moderator'
 2025-11-10 14:00:02,146 INFO aiogram.dispatcher: Polling stopped
+2025-11-10 14:01:05,984 INFO moder_telegram.app: Starting polling
+2025-11-10 14:01:05,985 INFO aiogram.dispatcher: Start polling
+2025-11-10 14:01:06,015 INFO aiogram.dispatcher: Run polling for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-10 14:01:12,582 INFO aiogram.event: Update id=868518987 is handled. Duration 152 ms by bot id=8347106464
+2025-11-10 14:01:35,743 INFO aiogram.event: Update id=868518988 is handled. Duration 67 ms by bot id=8347106464
+2025-11-10 14:01:58,603 INFO aiogram.event: Update id=868518989 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:02:07,989 INFO aiogram.event: Update id=868518990 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:03,406 INFO aiogram.event: Update id=868518991 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:10,104 INFO aiogram.event: Update id=868518992 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:11,643 INFO aiogram.event: Update id=868518993 is handled. Duration 1 ms by bot id=8347106464
+2025-11-10 14:14:12,986 INFO aiogram.event: Update id=868518994 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:14,866 INFO aiogram.event: Update id=868518995 is handled. Duration 1 ms by bot id=8347106464
+2025-11-10 14:14:16,003 INFO aiogram.event: Update id=868518996 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:17,149 INFO aiogram.event: Update id=868518997 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:18,597 INFO aiogram.event: Update id=868518998 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:19,812 INFO aiogram.event: Update id=868518999 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:20,960 INFO aiogram.event: Update id=868519000 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:22,339 INFO aiogram.event: Update id=868519001 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:22,892 INFO aiogram.event: Update id=868519002 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:23,078 INFO aiogram.event: Update id=868519003 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:23,614 INFO aiogram.event: Update id=868519004 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:24,218 INFO aiogram.event: Update id=868519005 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:24,537 INFO aiogram.event: Update id=868519006 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:25,141 INFO aiogram.event: Update id=868519007 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:26,347 INFO moder_telegram.app: Admin 6209247387 warned user 510257258 (total=1)
+2025-11-10 14:14:26,347 INFO aiogram.event: Update id=868519008 is handled. Duration 56 ms by bot id=8347106464
+2025-11-10 14:14:40,978 INFO aiogram.event: Update id=868519009 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:41,371 INFO aiogram.event: Update id=868519010 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:42,040 INFO aiogram.event: Update id=868519011 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:42,249 INFO aiogram.event: Update id=868519012 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:42,522 INFO aiogram.event: Update id=868519013 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:42,704 INFO aiogram.event: Update id=868519014 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:43,670 INFO aiogram.event: Update id=868519015 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:44,146 INFO aiogram.event: Update id=868519016 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:44,685 INFO aiogram.event: Update id=868519017 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:44,966 INFO aiogram.event: Update id=868519018 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:45,212 INFO aiogram.event: Update id=868519019 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:45,688 INFO aiogram.event: Update id=868519020 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:46,171 INFO aiogram.event: Update id=868519021 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:46,785 INFO aiogram.event: Update id=868519022 is handled. Duration 1 ms by bot id=8347106464
+2025-11-10 14:14:47,148 INFO aiogram.event: Update id=868519023 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:47,728 INFO aiogram.event: Update id=868519024 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:49,076 INFO aiogram.event: Update id=868519025 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:50,056 INFO aiogram.event: Update id=868519026 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:50,258 INFO aiogram.event: Update id=868519027 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:50,468 INFO aiogram.event: Update id=868519028 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:50,868 INFO aiogram.event: Update id=868519029 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:51,102 INFO aiogram.event: Update id=868519030 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:51,359 INFO aiogram.event: Update id=868519031 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 14:14:51,693 INFO moder_telegram.app: Admin 6209247387 banned user 510257258
+2025-11-10 14:14:51,693 INFO aiogram.event: Update id=868519032 is handled. Duration 52 ms by bot id=8347106464
+2025-11-10 14:14:52,024 INFO aiogram.event: Update id=868519033 is handled. Duration 69 ms by bot id=8347106464
+2025-11-10 14:14:52,372 INFO aiogram.event: Update id=868519034 is handled. Duration 65 ms by bot id=8347106464
+2025-11-10 14:14:53,398 INFO aiogram.event: Update id=868519035 is handled. Duration 62 ms by bot id=8347106464
+2025-11-10 14:14:53,580 INFO aiogram.event: Update id=868519036 is handled. Duration 50 ms by bot id=8347106464
+2025-11-10 14:14:53,809 INFO aiogram.event: Update id=868519037 is handled. Duration 73 ms by bot id=8347106464
+2025-11-10 14:14:54,938 INFO aiogram.event: Update id=868519038 is handled. Duration 89 ms by bot id=8347106464
+2025-11-10 14:14:54,990 INFO aiogram.event: Update id=868519039 is handled. Duration 103 ms by bot id=8347106464
+2025-11-10 14:14:55,474 INFO aiogram.event: Update id=868519040 is handled. Duration 186 ms by bot id=8347106464
+2025-11-10 14:14:55,667 INFO aiogram.event: Update id=868519041 is handled. Duration 145 ms by bot id=8347106464
+2025-11-10 14:14:55,992 INFO aiogram.event: Update id=868519042 is handled. Duration 85 ms by bot id=8347106464
+2025-11-10 14:14:56,579 INFO aiogram.event: Update id=868519043 is handled. Duration 77 ms by bot id=8347106464
+2025-11-10 14:14:57,123 INFO aiogram.event: Update id=868519044 is handled. Duration 116 ms by bot id=8347106464
+2025-11-10 14:15:21,308 INFO aiogram.event: Update id=868519045 is handled. Duration 132 ms by bot id=8347106464
+2025-11-10 14:15:30,367 INFO moder_telegram.app: Admin 6209247387 unbanned user 510257258
+2025-11-10 14:15:30,367 INFO aiogram.event: Update id=868519046 is handled. Duration 48 ms by bot id=8347106464
+2025-11-10 14:15:53,547 INFO aiogram.event: Update id=868519047 is handled. Duration 42 ms by bot id=8347106464
+2025-11-10 14:18:28,555 WARNING aiogram.dispatcher: Received SIGINT signal
+2025-11-10 14:18:28,556 INFO aiogram.dispatcher: Polling stopped for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-10 14:18:28,556 INFO aiogram.dispatcher: Polling stopped
