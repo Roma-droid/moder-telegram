@@ -77,12 +77,10 @@ def _user_display_from_message_user(u) -> str:
 
 
 def _extract_target_and_reason(parts: list[str], message: Message) -> tuple[Optional[int], Optional[str], Optional[object]]:
-    """Return (target_uid, reason, replied_user).
+    """Synchronous extraction for replies and numeric ids.
 
-    - If command is sent as a reply: target comes from replied message author and
-      reason is the remainder of parts after the command (if any).
-    - Otherwise, expects: /cmd <user_id> [reason...]
-    - Returns (None, None, None) when parsing fails (invalid id).
+    Kept for backwards compatibility. For username resolution use
+    the async helper `_resolve_target_and_reason` below.
     """
     target_uid: Optional[int] = None
     reason: Optional[str] = None
@@ -102,6 +100,47 @@ def _extract_target_and_reason(parts: list[str], message: Message) -> tuple[Opti
             reason = " ".join(parts[2:]).strip() or None
 
     return target_uid, reason, replied_user
+
+
+async def _resolve_target_and_reason(parts: list[str], message: Message) -> tuple[Optional[int], Optional[str], Optional[object]]:
+    """Asynchronously resolve a command target.
+
+    Supports three forms:
+    - reply: take user from replied message
+    - numeric id: /cmd 12345 [reason]
+    - username: /cmd @username [reason] or /cmd username [reason]
+
+    Returns (user_id or None, reason or None, replied_user object or None).
+    """
+    # If it's a reply - immediate
+    if message.reply_to_message and message.reply_to_message.from_user:
+        replied_user = message.reply_to_message.from_user
+        target_uid = replied_user.id
+        reason = " ".join(parts[1:]).strip() if len(parts) >= 2 else None
+        return target_uid, reason, replied_user
+
+    # Not a reply - must have at least an argument
+    if len(parts) < 2:
+        return None, None, None
+
+    arg = parts[1]
+    # try numeric id first
+    try:
+        target_uid = int(arg)
+        reason = " ".join(parts[2:]).strip() if len(parts) >= 3 else None
+        return target_uid, reason, None
+    except ValueError:
+        # treat as username
+        username = arg.lstrip("@")
+        try:
+            # Bot.get_chat accepts @username and returns Chat with id
+            chat = await message.bot.get_chat(f"@{username}")
+            target_uid = int(getattr(chat, "id", None))
+            reason = " ".join(parts[2:]).strip() if len(parts) >= 3 else None
+            return target_uid, reason, None
+        except Exception:
+            logger.debug("Failed to resolve username '%s' to id", username)
+            return None, None, None
 
 
 async def _safe_send_audit(chat_id: int, text: str, bot: Bot) -> None:
@@ -190,7 +229,7 @@ async def _on_command(message: Message) -> None:
 
     # /ban
     if cmd == "/ban":
-        target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
+        target_uid, reason, replied_user = await _resolve_target_and_reason(parts, message)
         if target_uid is None:
             await message.answer("Использование: /ban <user_id> [reason] или ответьте на сообщение и выполните /ban [reason]")
             return
@@ -216,7 +255,7 @@ async def _on_command(message: Message) -> None:
 
     # /warn
     if cmd == "/warn":
-        target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
+        target_uid, reason, replied_user = await _resolve_target_and_reason(parts, message)
         if target_uid is None:
             await message.answer("Использование: /warn <user_id> [reason] или ответьте на сообщение и выполните /warn [reason]")
             return
@@ -250,7 +289,7 @@ async def _on_command(message: Message) -> None:
 
     # /unban
     if cmd == "/unban":
-        target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
+        target_uid, reason, replied_user = await _resolve_target_and_reason(parts, message)
         if target_uid is None:
             await message.answer("Использование: /unban <user_id> [reason] или ответьте на сообщение и выполните /unban [reason]")
             return
@@ -276,7 +315,7 @@ async def _on_command(message: Message) -> None:
 
     # /mute
     if cmd == "/mute":
-        target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
+        target_uid, reason, replied_user = await _resolve_target_and_reason(parts, message)
         if target_uid is None:
             await message.answer("Использование: /mute <user_id> [reason] или ответьте на сообщение и выполните /mute [reason]")
             return
@@ -302,7 +341,7 @@ async def _on_command(message: Message) -> None:
 
     # /unmute
     if cmd == "/unmute":
-        target_uid, reason, replied_user = _extract_target_and_reason(parts, message)
+        target_uid, reason, replied_user = await _resolve_target_and_reason(parts, message)
         if target_uid is None:
             await message.answer("Использование: /unmute <user_id> [reason] или ответьте на сообщение и выполните /unmute [reason]")
             return
