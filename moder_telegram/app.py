@@ -457,7 +457,7 @@ async def _on_command(message: Message) -> None:
             details_txt = html.escape(details) if details else ""
             lines.append(f"{html.escape(ts)} — <b>{html.escape(action)}</b> by {html.escape(str(admin_txt))} {details_txt}")
 
-    await _reply_with_optional_delete(message, "\n".join(lines), parse_mode="HTML")
+        await _reply_with_optional_delete(message, "\n".join(lines), parse_mode="HTML")
 
 
 async def _run_async(token: str) -> None:
