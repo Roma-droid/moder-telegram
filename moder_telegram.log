@@ -56,3 +56,30 @@
 2025-11-09 11:26:31,435 INFO aiogram.event: Update id=868518972 is handled. Duration 77 ms by bot id=8347106464
 2025-11-09 11:29:36,446 INFO aiogram.event: Update id=868518973 is handled. Duration 30 ms by bot id=8347106464
 2025-11-09 11:35:35,402 INFO aiogram.event: Update id=868518974 is handled. Duration 105 ms by bot id=8347106464
+2025-11-10 13:41:21,732 INFO moder_telegram.app: Starting polling
+2025-11-10 13:41:21,733 INFO aiogram.dispatcher: Start polling
+2025-11-10 13:41:21,756 INFO aiogram.dispatcher: Run polling for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-10 13:41:24,683 WARNING aiogram.dispatcher: Received SIGINT signal
+2025-11-10 13:41:24,684 INFO aiogram.dispatcher: Polling stopped for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-10 13:41:24,684 INFO aiogram.dispatcher: Polling stopped
+2025-11-10 13:41:41,913 INFO moder_telegram.app: Starting polling
+2025-11-10 13:41:41,913 INFO aiogram.dispatcher: Start polling
+2025-11-10 13:41:41,941 INFO aiogram.dispatcher: Run polling for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-10 13:43:11,651 INFO aiogram.event: Update id=868518975 is handled. Duration 1 ms by bot id=8347106464
+2025-11-10 13:43:23,435 INFO aiogram.event: Update id=868518976 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 13:43:23,436 INFO aiogram.event: Update id=868518977 is handled. Duration 1 ms by bot id=8347106464
+2025-11-10 13:44:14,136 INFO aiogram.event: Update id=868518978 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 13:44:24,938 INFO aiogram.event: Update id=868518979 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 13:44:35,673 INFO aiogram.event: Update id=868518980 is handled. Duration 54 ms by bot id=8347106464
+2025-11-10 13:46:31,173 WARNING aiogram.dispatcher: Received SIGINT signal
+2025-11-10 13:46:31,173 INFO aiogram.dispatcher: Polling stopped for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-10 13:46:31,174 INFO aiogram.dispatcher: Polling stopped
+2025-11-10 13:46:54,520 INFO moder_telegram.app: Starting polling
+2025-11-10 13:46:54,521 INFO aiogram.dispatcher: Start polling
+2025-11-10 13:46:54,557 INFO aiogram.dispatcher: Run polling for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-10 13:47:01,592 INFO aiogram.event: Update id=868518981 is handled. Duration 0 ms by bot id=8347106464
+2025-11-10 13:47:13,959 INFO aiogram.event: Update id=868518982 is handled. Duration 207 ms by bot id=8347106464
+2025-11-10 13:47:47,814 INFO aiogram.event: Update id=868518983 is handled. Duration 96 ms by bot id=8347106464
+2025-11-10 13:47:54,880 WARNING aiogram.dispatcher: Received SIGINT signal
+2025-11-10 13:47:54,880 INFO aiogram.dispatcher: Polling stopped for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-10 13:47:54,881 INFO aiogram.dispatcher: Polling stopped
