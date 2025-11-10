@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 
 DB_PATH = os.environ.get("DB_PATH", None)
 AUDIT_CHAT_IDS_RAW = os.environ.get("AUDIT_CHAT_IDS", "")
+MODERATION_CHAT_IDS_RAW = os.environ.get("MODERATION_CHAT_IDS", "")
 
 
 def _get_audit_chats() -> list[int]:
@@ -43,6 +44,20 @@ def _get_audit_chats() -> list[int]:
             ids.append(int(part))
         except ValueError:
             logger.warning("Invalid audit chat id in AUDIT_CHAT_IDS: %s", part)
+    return ids
+
+
+def _get_moderation_chats() -> list[int]:
+    ids: list[int] = []
+    raw = MODERATION_CHAT_IDS_RAW
+    for part in raw.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        try:
+            ids.append(int(part))
+        except ValueError:
+            logger.warning("Invalid moderation chat id in MODERATION_CHAT_IDS: %s", part)
     return ids
 
 
@@ -158,6 +173,20 @@ async def _on_command(message: Message) -> None:
     if user is None or user.id not in admins:
         await message.answer("Только администраторы могут использовать эту команду.")
         return
+
+    # Restrict certain moderation commands to configured moderation group(s)
+    moderation_cmds = {"/ban", "/warn", "/mute"}
+    if cmd in moderation_cmds:
+        allowed = _get_moderation_chats()
+        # If no moderation chat configured, allow by default (backwards-compatible)
+        if allowed:
+            chat = getattr(message, "chat", None)
+            chat_id = getattr(chat, "id", None)
+            if chat_id not in allowed:
+                await message.answer(
+                    "Команды /ban, /warn и /mute доступны только в модерационной группе."
+                )
+                return
 
     # /ban
     if cmd == "/ban":
