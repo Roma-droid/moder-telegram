@@ -248,6 +248,19 @@ async def _on_command(message: Message) -> None:
         await _reply_with_optional_delete(message, help_text, parse_mode="HTML")
         return
 
+    # Public command to show warns for the calling user
+    if cmd == "/mywarns":
+        calling_user = message.from_user
+        if calling_user is None:
+            await _reply_with_optional_delete(message, "Не удалось определить пользователя.")
+            return
+        count = storage.get_warn_count(calling_user.id, DB_PATH)
+        if count:
+            await _reply_with_optional_delete(message, f"У вас предупреждений: {count}.")
+        else:
+            await _reply_with_optional_delete(message, "У вас нет предупреждений.")
+        return
+
     user = message.from_user
     admins = _get_admins()
     if user is None or user.id not in admins:
