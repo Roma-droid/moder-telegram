@@ -218,3 +218,10 @@ Traceback (most recent call last):
     await _reply_with_optional_delete(message, "\n".join(lines), parse_mode="HTML")
                                                          ^^^^^
 UnboundLocalError: cannot access local variable 'lines' where it is not associated with a value
+2025-11-11 23:53:33,715 INFO moder_telegram.app: Starting polling
+2025-11-11 23:53:33,720 INFO aiogram.dispatcher: Start polling
+2025-11-11 23:53:33,757 INFO aiogram.dispatcher: Run polling for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-11 23:54:08,672 INFO aiogram.event: Update id=868519049 is handled. Duration 42 ms by bot id=8347106464
+2025-11-11 23:54:12,989 INFO aiogram.event: Update id=868519050 is handled. Duration 0 ms by bot id=8347106464
+2025-11-11 23:54:15,212 INFO aiogram.event: Update id=868519051 is handled. Duration 0 ms by bot id=8347106464
+2025-11-11 23:54:22,806 INFO aiogram.event: Update id=868519052 is handled. Duration 0 ms by bot id=8347106464

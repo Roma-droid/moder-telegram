@@ -231,6 +231,23 @@ async def _on_command(message: Message) -> None:
     parts = text.split()
     cmd = parts[0].lower()
 
+    # Public help command (available to all users)
+    if cmd == "/help":
+        help_text = (
+            "Доступные команды:\n"
+            "<b>/help</b> — показать это сообщение\n"
+            "<b>/ban</b> &lt;user_id|@username&gt; [reason] — заблокировать пользователя (админы)\n"
+            "<b>/warn</b> &lt;user_id|@username&gt; [reason] — выдать предупреждение (админы)\n"
+            "<b>/mute</b> &lt;user_id|@username&gt; [reason] — заглушить пользователя (админы)\n"
+            "<b>/unmute</b> &lt;user_id|@username&gt; [reason] — снять заглушение (админы)\n"
+            "<b>/unban</b> &lt;user_id|@username&gt; [reason] — разблокировать пользователя (админы)\n"
+            "<b>/stats</b> — показать статистику (админы)\n"
+            "<b>/audit</b> &lt;user_id&gt; — показать записи аудита для пользователя (админы)\n"
+            "Используйте команду в ответе на сообщение, чтобы применить действие к конкретному сообщению пользователя."
+        )
+        await _reply_with_optional_delete(message, help_text, parse_mode="HTML")
+        return
+
     user = message.from_user
     admins = _get_admins()
     if user is None or user.id not in admins:
