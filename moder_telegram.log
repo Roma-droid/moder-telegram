@@ -283,3 +283,29 @@ UnboundLocalError: cannot access local variable 'lines' where it is not associat
 2025-11-12 09:19:44,420 WARNING aiogram.dispatcher: Received SIGINT signal
 2025-11-12 09:19:44,421 INFO aiogram.dispatcher: Polling stopped for bot @moderator225_bot id=8347106464 - 'moderator'
 2025-11-12 09:19:44,421 INFO aiogram.dispatcher: Polling stopped
+2025-11-12 09:19:58,427 INFO moder_telegram.app: Starting polling
+2025-11-12 09:19:58,428 INFO aiogram.dispatcher: Start polling
+2025-11-12 09:19:58,462 INFO aiogram.dispatcher: Run polling for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-12 09:20:05,276 INFO aiogram.event: Update id=868519066 is handled. Duration 54 ms by bot id=8347106464
+2025-11-12 09:20:16,874 INFO aiogram.event: Update id=868519067 is handled. Duration 0 ms by bot id=8347106464
+2025-11-12 09:20:21,456 ERROR moder_telegram.app: Failed to send reply message
+Traceback (most recent call last):
+  File "/workspaces/moder-telegram/moder_telegram/app.py", line 160, in _reply_with_optional_delete
+    sent = await orig_message.answer(text, parse_mode=parse_mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/aiogram/methods/base.py", line 84, in emit
+    return await bot(self)
+           ^^^^^^^^^^^^^^^
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/aiogram/client/bot.py", line 485, in __call__
+    return await self.session(self, method, timeout=request_timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/aiogram/client/session/base.py", line 254, in __call__
+    return cast(TelegramType, await middleware(bot, method))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/aiogram/client/session/aiohttp.py", line 185, in make_request
+    response = self.check_response(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/python/3.12.1/lib/python3.12/site-packages/aiogram/client/session/base.py", line 120, in check_response
+    raise TelegramBadRequest(method=method, message=description)
+aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: can't parse entities: Unsupported start tag "section" at byte offset 722
+2025-11-12 09:20:21,460 INFO aiogram.event: Update id=868519068 is handled. Duration 7 ms by bot id=8347106464

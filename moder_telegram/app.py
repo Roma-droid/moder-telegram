@@ -315,7 +315,7 @@ async def _on_command(message: Message) -> None:
                 available = ", ".join(sorted(sections.keys()))
                 await _reply_with_optional_delete(
                     message,
-                    f"Раздел '{html.escape(section)}' не найден. Доступные разделы: {available}. Используйте /rules <section>.",
+                    f"Раздел '{html.escape(section)}' не найден. Доступные разделы: {available}. Используйте /rules &lt;section&gt;.",
                 )
                 return
 
@@ -328,7 +328,7 @@ async def _on_command(message: Message) -> None:
             "4. Соблюдайте тему чата и инструкции модераторов.\n"
             "5. Для серьёзных нарушений используйте обращения к модераторам.\n\n"
             "Нарушения могут привести к предупреждениям, мутам и банам.\n"
-            f"Доступные разделы: {', '.join(sorted(sections.keys()))}. Используйте /rules <section>."
+            f"Доступные разделы: {', '.join(sorted(sections.keys()))}. Используйте /rules &lt;section&gt;."
         )
         await _reply_with_optional_delete(message, rules_text, parse_mode="HTML")
         return
