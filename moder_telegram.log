@@ -232,3 +232,14 @@ UnboundLocalError: cannot access local variable 'lines' where it is not associat
 2025-11-11 23:56:38,229 INFO aiogram.dispatcher: Start polling
 2025-11-11 23:56:38,263 INFO aiogram.dispatcher: Run polling for bot @moderator225_bot id=8347106464 - 'moderator'
 2025-11-11 23:56:44,953 INFO aiogram.event: Update id=868519053 is handled. Duration 39 ms by bot id=8347106464
+2025-11-12 00:05:17,640 WARNING aiogram.dispatcher: Received SIGINT signal
+2025-11-12 00:05:17,640 INFO aiogram.dispatcher: Polling stopped for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-12 00:05:17,640 INFO aiogram.dispatcher: Polling stopped
+2025-11-12 00:05:22,202 INFO moder_telegram.app: Starting polling
+2025-11-12 00:05:22,203 INFO aiogram.dispatcher: Start polling
+2025-11-12 00:05:22,238 INFO aiogram.dispatcher: Run polling for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-12 00:07:27,563 INFO aiogram.event: Update id=868519054 is handled. Duration 57 ms by bot id=8347106464
+2025-11-12 00:07:47,415 INFO aiogram.event: Update id=868519055 is handled. Duration 25 ms by bot id=8347106464
+2025-11-12 00:08:41,928 WARNING aiogram.dispatcher: Received SIGINT signal
+2025-11-12 00:08:41,928 INFO aiogram.dispatcher: Polling stopped for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-12 00:08:41,929 INFO aiogram.dispatcher: Polling stopped

@@ -243,6 +243,7 @@ async def _on_command(message: Message) -> None:
             "<b>/unban</b> &lt;user_id|@username&gt; [reason] — разблокировать пользователя (админы)\n"
             "<b>/stats</b> — показать статистику (админы)\n"
             "<b>/audit</b> &lt;user_id&gt; — показать записи аудита для пользователя (админы)\n"
+            "<b>/mywarns</b> — показать количество ваших предупреждений\n\n"
             "Используйте команду в ответе на сообщение, чтобы применить действие к конкретному сообщению пользователя."
         )
         await _reply_with_optional_delete(message, help_text, parse_mode="HTML")
