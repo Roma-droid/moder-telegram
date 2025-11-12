@@ -245,6 +245,7 @@ async def _on_command(message: Message) -> None:
             "<b>/audit</b> &lt;user_id&gt; — показать записи аудита для пользователя (админы)\n"
             "<b>/mywarns</b> — показать количество ваших предупреждений\n\n"
             "<b>/rules</b> [section] — показать правила сообщества\n\n"
+            "<b>/plaint</b> [user_id|@username] — пожаловаться на пользователя\n\n"
             "Используйте команду в ответе на сообщение, чтобы применить действие к конкретному сообщению пользователя."
         )
         await _reply_with_optional_delete(message, help_text, parse_mode="HTML")
