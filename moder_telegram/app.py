@@ -249,12 +249,33 @@ async def _on_command(message: Message) -> None:
         await _reply_with_optional_delete(message, help_text, parse_mode="HTML")
         return
 
-    # Public command to show warns for the calling user
+    # Public command to show warns for the calling user; admins may pass a user_id
     if cmd == "/mywarns":
         calling_user = message.from_user
         if calling_user is None:
             await _reply_with_optional_delete(message, "Не удалось определить пользователя.")
             return
+
+        # If an argument is provided, only admins can query other users
+        if len(parts) >= 2:
+            admins = _get_admins()
+            if calling_user.id not in admins:
+                await _reply_with_optional_delete(message, "Только администраторы могут смотреть предупреждения других пользователей.")
+                return
+            try:
+                target_uid = int(parts[1])
+            except ValueError:
+                await _reply_with_optional_delete(message, "Неверный user_id")
+                return
+
+            count = storage.get_warn_count(target_uid, DB_PATH)
+            if count:
+                await _reply_with_optional_delete(message, f"У пользователя {target_uid} предупреждений: {count}.")
+            else:
+                await _reply_with_optional_delete(message, f"У пользователя {target_uid} нет предупреждений.")
+            return
+
+        # No argument — show calling user's warns
         count = storage.get_warn_count(calling_user.id, DB_PATH)
         if count:
             await _reply_with_optional_delete(message, f"У вас предупреждений: {count}.")
