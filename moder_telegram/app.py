@@ -283,6 +283,55 @@ async def _on_command(message: Message) -> None:
             await _reply_with_optional_delete(message, "У вас нет предупреждений.")
         return
 
+    # Public command to show community rules
+    if cmd == "/rules":
+        # Rules sections for quick access
+        sections: dict[str, str] = {
+            "general": (
+                "<b>Правила сообщества — Общие</b>\n"
+                "1. Уважайте других участников. Никаких оскорблений и травли.\n"
+                "2. Соблюдайте тему чата и инструкции модераторов.\n"
+            ),
+            "safety": (
+                "<b>Правила сообщества — Безопасность</b>\n"
+                "1. Запрещён спам, фишинг и мошенничество.\n"
+                "2. Не публикуйте личную информацию третьих лиц.\n"
+            ),
+            "sanctions": (
+                "<b>Правила сообщества — Санкции</b>\n"
+                "Нарушения могут привести к предупреждениям, мутам и банам.\n"
+                "Модераторы принимают решения согласно ситуации.\n"
+            ),
+        }
+
+        # If a section requested, show it or a helpful list
+        if len(parts) >= 2:
+            section = parts[1].lower()
+            if section in sections:
+                await _reply_with_optional_delete(message, sections[section], parse_mode="HTML")
+                return
+            else:
+                available = ", ".join(sorted(sections.keys()))
+                await _reply_with_optional_delete(
+                    message,
+                    f"Раздел '{html.escape(section)}' не найден. Доступные разделы: {available}. Используйте /rules <section>.",
+                )
+                return
+
+        # No section — show full rules (concise)
+        rules_text = (
+            "<b>Правила сообщества</b>\n"
+            "1. Уважайте других участников. Никаких оскорблений и травли.\n"
+            "2. Запрещён спам, фишинг и мошенничество.\n"
+            "3. Не публикуйте личную информацию третьих лиц.\n"
+            "4. Соблюдайте тему чата и инструкции модераторов.\n"
+            "5. Для серьёзных нарушений используйте обращения к модераторам.\n\n"
+            "Нарушения могут привести к предупреждениям, мутам и банам.\n"
+            f"Доступные разделы: {', '.join(sorted(sections.keys()))}. Используйте /rules <section>."
+        )
+        await _reply_with_optional_delete(message, rules_text, parse_mode="HTML")
+        return
+
     user = message.from_user
     admins = _get_admins()
     if user is None or user.id not in admins:
