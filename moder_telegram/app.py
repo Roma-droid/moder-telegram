@@ -333,6 +333,63 @@ async def _on_command(message: Message) -> None:
         await _reply_with_optional_delete(message, rules_text, parse_mode="HTML")
         return
 
+    # Public command to file a complaint/plaint.
+    # Usage:
+    # - reply to a user's message: /plaint [reason]
+    # - /plaint <user_id|@username> [reason]
+    # - /plaint <text> (general complaint without a specific user)
+    if cmd == "/plaint":
+        reporter = message.from_user
+        if reporter is None:
+            await _reply_with_optional_delete(message, "Не удалось определить пользователя.")
+            return
+
+        target_uid: Optional[int] = None
+        replied_user = None
+        reason: Optional[str] = None
+
+        # reply -> target is the replied user
+        if message.reply_to_message and message.reply_to_message.from_user:
+            replied_user = message.reply_to_message.from_user
+            target_uid = replied_user.id
+            reason = " ".join(parts[1:]).strip() if len(parts) >= 2 else None
+        elif len(parts) >= 2:
+            # if first arg looks like id or username, try resolving; otherwise treat as free-text reason
+            first = parts[1]
+            if first.startswith("@") or first.isdigit():
+                resolved_uid, resolved_reason, resolved_reply = await _resolve_target_and_reason(parts, message)
+                if resolved_uid is None and resolved_reason is None:
+                    await _reply_with_optional_delete(message, "Не удалось распознать пользователя. Использование: /plaint <user_id|@username> [text] или /plaint <text>")
+                    return
+                target_uid = resolved_uid
+                reason = resolved_reason
+                replied_user = resolved_reply
+            else:
+                reason = " ".join(parts[1:]).strip()
+        else:
+            await _reply_with_optional_delete(message, "Использование: /plaint <text> или ответьте на сообщение и выполните /plaint [reason]")
+            return
+
+        # Record plaint in audit table
+        storage.log_action("plaint", target_uid, reporter.id if reporter else None, details=reason, db_path=DB_PATH)
+
+        # Build audit notification
+        user_display = _user_display_from_message_user(replied_user) if replied_user else (html.escape(f"user {target_uid}") if target_uid else "-")
+        reporter_display = _user_display_from_message_user(reporter)
+        ts = datetime.now(timezone.utc).isoformat()
+        text_fmt = (
+            f"<b>Action:</b> plaint\n"
+            f"<b>User:</b> {user_display} (id: {target_uid})\n"
+            f"<b>Reporter:</b> {reporter_display} (id: {reporter.id})\n"
+            f"<b>Time (UTC):</b> {html.escape(ts)}\n"
+        )
+        if reason:
+            text_fmt += f"<b>Reason:</b> {html.escape(reason)}\n"
+
+        _notify_audit_chats_fire_and_forget(message, text_fmt)
+        await _reply_with_optional_delete(message, "Ваша жалоба зарегистрирована. Спасибо.")
+        return
+
     user = message.from_user
     admins = _get_admins()
     if user is None or user.id not in admins:

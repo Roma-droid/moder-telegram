@@ -309,3 +309,16 @@ Traceback (most recent call last):
     raise TelegramBadRequest(method=method, message=description)
 aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: can't parse entities: Unsupported start tag "section" at byte offset 722
 2025-11-12 09:20:21,460 INFO aiogram.event: Update id=868519068 is handled. Duration 7 ms by bot id=8347106464
+2025-11-12 09:47:25,722 WARNING aiogram.dispatcher: Received SIGINT signal
+2025-11-12 09:47:25,723 INFO aiogram.dispatcher: Polling stopped for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-12 09:47:25,725 INFO aiogram.dispatcher: Polling stopped
+2025-11-12 09:47:29,940 INFO moder_telegram.app: Starting polling
+2025-11-12 09:47:29,941 INFO aiogram.dispatcher: Start polling
+2025-11-12 09:47:29,963 INFO aiogram.dispatcher: Run polling for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-12 09:47:35,397 INFO aiogram.event: Update id=868519069 is handled. Duration 44 ms by bot id=8347106464
+2025-11-12 09:47:51,053 INFO aiogram.event: Update id=868519070 is handled. Duration 42 ms by bot id=8347106464
+2025-11-12 09:49:02,086 INFO aiogram.event: Update id=868519071 is handled. Duration 0 ms by bot id=8347106464
+2025-11-12 09:49:07,105 INFO aiogram.event: Update id=868519072 is handled. Duration 45 ms by bot id=8347106464
+2025-11-12 10:03:48,243 WARNING aiogram.dispatcher: Received SIGINT signal
+2025-11-12 10:03:48,244 INFO aiogram.dispatcher: Polling stopped for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-12 10:03:48,244 INFO aiogram.dispatcher: Polling stopped
