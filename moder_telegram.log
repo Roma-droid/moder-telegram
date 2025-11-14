@@ -329,3 +329,9 @@ aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: can't
 2025-11-12 10:05:31,384 WARNING aiogram.dispatcher: Received SIGINT signal
 2025-11-12 10:05:31,385 INFO aiogram.dispatcher: Polling stopped for bot @moderator225_bot id=8347106464 - 'moderator'
 2025-11-12 10:05:31,385 INFO aiogram.dispatcher: Polling stopped
+2025-11-12 10:19:31,285 INFO moder_telegram.app: Starting polling
+2025-11-12 10:19:31,286 INFO aiogram.dispatcher: Start polling
+2025-11-12 10:19:31,306 INFO aiogram.dispatcher: Run polling for bot @moderator225_bot id=8347106464 - 'moderator'
+2025-11-12 10:19:53,256 INFO aiogram.event: Update id=868519074 is handled. Duration 69 ms by bot id=8347106464
+2025-11-12 10:19:58,964 INFO aiogram.event: Update id=868519075 is handled. Duration 0 ms by bot id=8347106464
+2025-11-12 10:20:07,176 INFO aiogram.event: Update id=868519076 is handled. Duration 40 ms by bot id=8347106464
