@@ -6,8 +6,8 @@ import os
 # Examples:
 # BOT_TOKEN = "123456:ABC-def"
 # ADMINS = "6209247387,123456789"
-BOT_TOKEN = '8347106464:AAHqFXXMhEM-juzneZl0arHuLuzAdlb0nMA'
-ADMINS = '6209247387'
+BOT_TOKEN = ''
+ADMINS = ''
 
 
 if __name__ == "__main__":
